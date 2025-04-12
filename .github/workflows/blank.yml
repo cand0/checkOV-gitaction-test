@@ -1,0 +1,33 @@
+name: checkOV PR Scan
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-checkov:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install checkov
+        run: pip install checkov
+
+      - name: Run checkov
+        run: |
+          checkov -d . > result.txt
+          if grep -q "Critical" result.txt; then
+            echo "CRITICAL_FOUND=true" >> $GITHUB_ENV
+          fi
+
+      - name: Fail if critical found
+        if: env.CRITICAL_FOUND == 'true'
+        run: |
+          echo "❌ Critical issue found. Approval required."
+          exit 1
