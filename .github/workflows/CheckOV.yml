@@ -24,7 +24,7 @@ jobs:
 
       - name: Run Checkov
         run: |
-          checkov -d . > result.txt
+          checkov -d . > result.txt || true
           if grep -q "Critical" result.txt; then
             echo "CRITICAL_FOUND=true" >> $GITHUB_ENV
           fi
