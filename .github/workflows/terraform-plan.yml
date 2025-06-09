@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.issue.pull_request.head.sha }}
+          ref: ${{ github.event.issue.pull_request.head.ref }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
