@@ -19,26 +19,28 @@ jobs:
         with:
           terraform_version: "1.0.0"
 
-      - name: Show current directory and files
-        run: |
-          pwd
-          ls -alR
-
       - name: Terraform Init
         run: terraform init
-        working-directory: cand6
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
-        working-directory: cand6
+        run: terraform plan -no-color > plan.txt
+        working-directory: cand8
         continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get Plan Output
+        id: get_plan
+        run: |
+          echo "PLAN<<EOF" >> $GITHUB_ENV
+          cat cand8/plan.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       - name: Update PR Comment
         uses: actions/github-script@v6
         with:
@@ -46,14 +48,14 @@ jobs:
           script: |
             const output = `#### Terraform Plan Results
             \`\`\`
-            ${process.env.PLAN_OUTPUT}
+            ${process.env.PLAN}
             \`\`\`
             `;
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.name,
+              repo: context.repo.repo,
               body: output
             })
     
