@@ -19,9 +19,14 @@ jobs:
         with:
           terraform_version: "1.0.0"
 
+      - name: Show current directory and files
+        run: |
+          pwd
+          ls -alR
+
       - name: Terraform Init
         run: terraform init
-        working-directory: cand7
+        working-directory: cand8
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -29,7 +34,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color
-        working-directory: cand7
+        working-directory: cand8
         continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
